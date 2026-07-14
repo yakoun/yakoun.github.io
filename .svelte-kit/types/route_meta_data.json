@@ -1,0 +1,36 @@
+{
+	"/(app)": [],
+	"/": [],
+	"/(app)/a-propos": [],
+	"/admin/(dashboard)": [],
+	"/admin": [],
+	"/admin/certifications": [],
+	"/admin/education": [],
+	"/admin/experiences": [],
+	"/admin/gallery": [],
+	"/admin/hobbies": [],
+	"/admin/languages": [],
+	"/admin/messages": [],
+	"/admin/profil": [],
+	"/admin/projects": [],
+	"/admin/projects/new": [],
+	"/admin/projects/[id]": [],
+	"/admin/services": [],
+	"/admin/settings": [],
+	"/admin/skills": [],
+	"/admin/software": [],
+	"/api/github-sync": [
+		"src/routes/api/github-sync/+server.ts"
+	],
+	"/api/login": [
+		"src/routes/api/login/+server.ts"
+	],
+	"/auth/callback": [],
+	"/(app)/contact": [],
+	"/(auth)/login": [],
+	"/(app)/projets": [],
+	"/(app)/projets/[slug]": [],
+	"/sitemap.xml": [
+		"src/routes/sitemap.xml/+server.ts"
+	]
+}

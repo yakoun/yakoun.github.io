@@ -1,0 +1,1 @@
+import{w as o}from"./index.DqM2h4X3.js";const a=typeof window<"u"?localStorage.getItem("theme"):null,t=o(a==="light"?"light":"dark");t.subscribe(e=>{typeof window<"u"&&(localStorage.setItem("theme",e),document.documentElement.classList.toggle("dark",e==="dark"))});function n(){t.update(e=>e==="dark"?"light":"dark")}export{n as a,t};
