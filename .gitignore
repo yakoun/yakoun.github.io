@@ -1,0 +1,13 @@
+node_modules/
+build/
+.svelte-kit/
+.env
+*.pyc
+__pycache__/
+.DS_Store
+Thumbs.db
+*.db
+*.db-shm
+*.db-wal
+backend/pb_data/
+nginx/ssl/
