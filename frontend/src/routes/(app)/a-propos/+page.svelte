@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import { getProfile, getExperiences, getEducation, getSkills, getLanguages, getHobbies, getSoftwareTools, getCertifications, getImageUrl, isConfigured } from '$lib/api/supabase'
-  import { MapPin, Mail, Phone, Calendar, Download, Award, BookOpen, Cpu, Globe, Heart, Eye, Printer, Code, Zap, Wifi, Satellite, Network, GraduationCap, ShieldCheck } from 'lucide-svelte'
+  import { MapPin, Mail, Phone, Calendar, Award, BookOpen, Cpu, Globe, Heart, Eye, Code, Zap, Wifi, Satellite, Network, GraduationCap, ShieldCheck } from 'lucide-svelte'
 
   let profile: any = null
   let experiences: any[] = []
@@ -12,7 +12,6 @@
   let softwareTools: any[] = []
   let certifications: any[] = []
   let loading = true
-  let showPreview = false
   let visible: Record<string, boolean> = {}
 
   onMount(async () => {
@@ -42,7 +41,26 @@
 
   function formatDate(d: string) {
     if (!d) return ''
-    return new Date(d).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' })
+    const dateStr = /^\d{4}-\d{2}$/.test(d) ? d + '-01' : d
+    const dt = new Date(dateStr)
+    if (isNaN(dt.getTime())) return ''
+    return dt.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' })
+  }
+
+  function unpackDesc(exp: any) {
+    const result: any = { location: '', responsibilities: [] }
+    if (!exp) return result
+    if (exp.location) result.location = exp.location
+    if (exp.responsibilities?.length) {
+      result.responsibilities = exp.responsibilities
+      return result
+    }
+    const desc = exp.description || ''
+    const locMatch = desc.match(/\[LOC\](.+?)(?:\n|$)/)
+    if (locMatch) result.location = locMatch[1].trim()
+    const respMatch = desc.match(/\[RESP\](.+)/)
+    if (respMatch) result.responsibilities = respMatch[1].split('||').filter(Boolean)
+    return result
   }
 
   function observe(el: Element, name: string) {
@@ -53,48 +71,6 @@
   }
 
   const catIcons: Record<string, any> = { electricite: Zap, reseaux: Network, wifi: Wifi, paraboles: Satellite, 'dev-web': Code }
-
-  async function generatePDF() {
-    const el = document.getElementById('cv-content')
-    if (!el) return
-    const { default: html2canvas } = await import('html2canvas')
-    const { default: jsPDF } = await import('jspdf')
-    const canvas = await html2canvas(el, { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' })
-    const imgData = canvas.toDataURL('image/png')
-    const pdf = new jsPDF('p', 'mm', 'a4')
-    const pdfW = pdf.internal.pageSize.getWidth()
-    const pdfH = (canvas.height * pdfW) / canvas.width
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH)
-    pdf.save('CV-YAKOUN-Ouniboryabi.pdf')
-  }
-
-  function printCV() {
-    const el = document.getElementById('cv-content')
-    if (!el) return
-    const win = window.open('', '_blank')
-    if (!win) return
-    win.document.write(`<html><head><title>CV - ${p.first_name} ${p.last_name}</title>
-      <style>
-        body{margin:0;padding:15mm;font-family:Inter,sans-serif;color:#333;font-size:11pt;line-height:1.5}
-        @media print{body{padding:10mm}@page{margin:10mm}}
-        h2{font-size:14pt;border-bottom:2px solid #333;padding-bottom:3px;margin-top:15px}
-        h3{font-size:12pt;margin:5px 0}
-        .no-print{display:none!important}
-        .cv-section{margin-bottom:12px}
-        .print-grid{display:grid;grid-template-columns:1fr 2fr;gap:20px}
-        .sidebar{background:#1a1a2e;color:#fff;padding:15px;border-radius:4px}
-        .sidebar h3{font-size:10pt;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:4px;margin-top:10px}
-        .sidebar p,.sidebar div{font-size:9pt;color:rgba(255,255,255,.85)}
-        .main-content{padding:5px 0}
-        .badge{display:inline-block;background:#f0f0f0;padding:2px 8px;border-radius:3px;font-size:9pt;margin:2px}
-        .exp-item{border-left:2px solid #ddd;padding-left:10px;margin-bottom:10px}
-        .resp-item{font-size:9.5pt;color:#555;margin:1px 0}
-        ul{margin:2px 0;padding-left:16px}
-        li{font-size:9.5pt;color:#555}
-      </style></head><body>${el.innerHTML}</body></html>`)
-    win.document.close()
-    setTimeout(() => { win.print(); win.close() }, 500)
-  }
 </script>
 
 <svelte:head><title>À propos — {p.first_name} {p.last_name}</title></svelte:head>
@@ -215,6 +191,7 @@
         <div class="relative pl-8">
           <div class="absolute left-3 top-2 bottom-2 w-0.5 bg-gradient-to-b from-purple-500 via-pink-500 to-purple-500" />
           {#each experiences as exp, i}
+            {@const u = unpackDesc(exp)}
             <div class="relative pb-8 last:pb-0 transition-all duration-700" style="transition-delay: {i * 150}ms; opacity: {visible['experience'] ? '1' : '0'}; transform: translateX({visible['experience'] ? '0' : '-30px'});">
               <div class="absolute left-[-22px] top-1 w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/30">
                 <div class="w-2 h-2 rounded-full bg-white" />
@@ -222,8 +199,16 @@
               <div class="p-5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:shadow-lg transition-shadow">
                 <p class="text-xs text-gray-500 mb-1">{formatDate(exp.start_date)} — {exp.current ? 'Actuel' : formatDate(exp.end_date)}</p>
                 <h3 class="font-bold text-lg">{exp.role}</h3>
-                <p class="text-sm text-primary-600 font-medium mb-2">{exp.company}</p>
-                {#if exp.description}<p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{exp.description}</p>{/if}
+                <p class="text-sm text-primary-600 font-medium mb-2">{exp.company}{#if u.location} · {u.location}{/if}</p>
+                {#if u.responsibilities.length > 0}
+                  <ul class="space-y-1">
+                    {#each u.responsibilities as r}
+                      <li class="text-sm text-gray-500 dark:text-gray-400 flex items-start gap-2"><span class="text-primary-400 mt-1">•</span> {r}</li>
+                    {/each}
+                  </ul>
+                {:else if exp.description && !exp.description.startsWith('[')}
+                  <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{exp.description}</p>
+                {/if}
               </div>
             </div>
           {/each}
@@ -296,69 +281,11 @@
       {/if}
 
       <div class="text-center">
-        <button on:click={() => showPreview = true} class="btn-primary px-8 py-3 text-base gap-2 shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40 transition-shadow">
-          <Eye size={18} /> Aperçu du CV
-        </button>
+        <a href="https://cvdesignr.com/p/b4y5Vld8JvXQoxn" target="_blank" rel="noopener noreferrer" class="btn-primary px-8 py-3 text-base gap-2 shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40 transition-all">
+          <Eye size={18} /> Voir mon CV
+        </a>
       </div>
 
     {/if}
   </div>
 </section>
-
-<!-- Modal -->
-{#if showPreview}
-  <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions a11y-noninteractive-element-interactions -->
-  <div role="dialog" aria-modal="true" class="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" on:click={() => showPreview = false} on:keydown={(e) => e.key === 'Escape' && (showPreview = false)}>
-    <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
-    <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" on:click|stopPropagation>
-      <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
-        <h2 class="font-bold">Aperçu du CV</h2>
-        <div class="flex items-center gap-2">
-          <button on:click={printCV} class="btn-ghost border border-gray-300 text-sm"><Printer size={16} /> Imprimer</button>
-          <button on:click={generatePDF} class="btn-primary text-sm"><Download size={16} /> Télécharger PDF</button>
-          <button on:click={() => showPreview = false} class="btn-ghost text-sm">Fermer</button>
-        </div>
-      </div>
-      <div class="p-6" id="cv-content">
-        <div class="flex flex-col md:flex-row">
-          <div class="w-full md:w-[30%] bg-primary-700 text-white p-6">
-            <div class="text-center mb-6">
-              <div class="w-20 h-20 mx-auto rounded-full bg-white/20 flex items-center justify-center text-3xl font-bold mb-3">{p.first_name?.charAt(0)}{p.last_name?.charAt(0)}</div>
-              <h2 class="font-bold text-lg">{p.first_name} {p.last_name}</h2>
-              <p class="text-white/80 text-sm">{p.title}</p>
-            </div>
-            <div class="space-y-2 text-sm">
-              {#if p.address}<p class="flex items-center gap-2 text-white/80"><MapPin size={14} /> {p.address}</p>{/if}
-              {#if p.email}<p class="flex items-center gap-2 text-white/80"><Mail size={14} /> {p.email}</p>{/if}
-              {#if p.phone}<p class="flex items-center gap-2 text-white/80"><Phone size={14} /> {p.phone}</p>{/if}
-              {#if p.birth_date}<p class="flex items-center gap-2 text-white/80"><Calendar size={14} /> {formatDate(p.birth_date)}</p>{/if}
-            </div>
-            <hr class="border-white/20 my-4" />
-            <h3 class="text-sm font-bold uppercase tracking-wider mb-3">Compétences</h3>
-            <div class="space-y-2">{#each skills as s}<div><div class="flex justify-between text-xs mb-0.5"><span>{s.name}</span>{#if s.level}<span class="opacity-70">{s.level}/5</span>{/if}</div>{#if s.level}<div class="h-1.5 rounded-full bg-white/20"><div class="h-full rounded-full bg-white" style="width: {s.level * 20}%"></div></div>{/if}</div>{/each}</div>
-            <hr class="border-white/20 my-4" />
-            <h3 class="text-sm font-bold uppercase tracking-wider mb-3">Langues</h3>
-            <div class="space-y-1">{#each languages as l}<div class="flex justify-between text-xs"><span>{l.name}</span>{#if l.level}<span class="opacity-70">{['Débutant','Intermédiaire','Avancé','Courant','Natif'][l.level - 1]}</span>{/if}</div>{/each}</div>
-          </div>
-          <div class="w-full md:w-[70%] p-6">
-            {#if p.summary}<div class="mb-6"><h3 class="text-xs font-bold uppercase tracking-wider bg-gray-900 text-white px-3 py-1 rounded mb-2 inline-block">Profil</h3><p class="text-sm text-gray-700 leading-relaxed">{p.summary}</p></div>{/if}
-            <div class="mb-6">
-              <h3 class="text-xs font-bold uppercase tracking-wider bg-gray-900 text-white px-3 py-1 rounded mb-3 inline-block">Expériences</h3>
-              <div class="space-y-3">{#each experiences as exp}<div class="border-l-2 border-gray-300 pl-3"><p class="text-xs text-gray-500">{formatDate(exp.start_date)} — {exp.current ? 'Actuel' : formatDate(exp.end_date)}</p><h4 class="font-semibold text-sm">{exp.role}</h4><p class="text-xs text-primary-600 font-medium">{exp.company}</p>{#if exp.description}<p class="text-xs text-gray-600 mt-1">{exp.description}</p>{/if}</div>{/each}</div>
-            </div>
-            <div>
-              <h3 class="text-xs font-bold uppercase tracking-wider bg-gray-900 text-white px-3 py-1 rounded mb-3 inline-block">Formations</h3>
-              <div class="space-y-3">{#each education as edu}<div class="border-l-2 border-gray-300 pl-3"><p class="text-xs text-gray-500">{formatDate(edu.start_date)} — {formatDate(edu.end_date) || 'Présent'}</p><h4 class="font-semibold text-sm">{edu.degree}</h4><p class="text-xs text-primary-600 font-medium">{edu.institution}{#if edu.field} · {edu.field}{/if}</p></div>{/each}</div>
-            </div>
-            {#if certifications.length > 0}
-              <div class="mt-4">
-                <h3 class="text-xs font-bold uppercase tracking-wider bg-gray-900 text-white px-3 py-1 rounded mb-3 inline-block">Certifications</h3>
-                <div class="space-y-2">{#each certifications as cert}<div class="border-l-2 border-gray-300 pl-3"><h4 class="font-semibold text-sm">{cert.title}</h4><p class="text-xs text-primary-600">{cert.organization}{#if cert.date} · {cert.date}{/if}</p>{#if cert.description}<p class="text-xs text-gray-600">{cert.description}</p>{/if}</div>{/each}</div>
-              </div>
-            {/if}
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-{/if}

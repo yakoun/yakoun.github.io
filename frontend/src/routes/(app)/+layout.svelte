@@ -3,6 +3,7 @@
   import ThemeToggle from '$lib/components/ThemeToggle.svelte'
   import { Menu, X } from 'lucide-svelte'
   import { onMount } from 'svelte'
+  import { page } from '$app/stores'
   import { supabase } from '$lib/api/supabase'
 
   let mobileOpen = false
@@ -47,8 +48,8 @@
       <!-- Desktop nav -->
       <div class="hidden md:flex items-center gap-1 bg-white/50 dark:bg-gray-900/50 backdrop-blur-md rounded-2xl p-1 shadow-sm border border-gray-200/50 dark:border-gray-800/50">
         {#each links as link}
-          <a href={link.href} on:click={() => mobileOpen = false} class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:text-primary-600 text-gray-600 dark:text-gray-400 active:scale-95">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={link.icon} /></svg>
+          <a href={link.href} on:click={() => mobileOpen = false} class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 {$page.url.pathname === link.href ? 'bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 shadow-sm' : 'hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600 text-gray-600 dark:text-gray-400'} active:scale-95">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="{$page.url.pathname === link.href ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={link.icon} /></svg>
             {link.label}
           </a>
         {/each}
@@ -67,8 +68,8 @@
     {#if mobileOpen}
       <div class="md:hidden border-t border-gray-200/50 dark:border-gray-800/50 bg-white/95 dark:bg-gray-950/95 backdrop-blur-md px-4 py-3 space-y-1 shadow-lg animate-slideDown">
         {#each links as link}
-          <a href={link.href} on:click={() => mobileOpen = false} class="flex items-center gap-3 w-full px-3 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:text-primary-600 transition-all">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={link.icon} /></svg>
+          <a href={link.href} on:click={() => mobileOpen = false} class="flex items-center gap-3 w-full px-3 py-3 rounded-xl text-sm font-medium transition-all {$page.url.pathname === link.href ? 'bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600'}">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="{$page.url.pathname === link.href ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d={link.icon} /></svg>
             {link.label}
           </a>
         {/each}

@@ -12,6 +12,12 @@
     { company: 'SNPT', role: "Stage d'immersion - Entretien Électrique", location: 'Hahotoé', start_date: '2017-07', end_date: '2017-08', responsibilities: ['Diagnostic des systèmes électriques', 'Analyse des schémas électriques', 'Maintenance préventive', 'Maintenance corrective'], current: false }
   ]
 
+  function toISODate(d: string) {
+    if (!d) return null
+    if (/^\d{4}-\d{2}$/.test(d)) return d + '-01'
+    return d
+  }
+
   function pack(item: any) {
     const loc = item.location || ''
     const resps = (item.responsibilities || []).filter((r: string) => r.trim())
@@ -46,7 +52,7 @@
         await supabase.from('experience').insert({
           company: s.company, role: s.role,
           description: pack(s),
-          start_date: s.start_date, end_date: s.end_date,
+          start_date: toISODate(s.start_date), end_date: toISODate(s.end_date),
           current: s.current, order: i
         })
       }
@@ -81,18 +87,18 @@
 
   async function save() {
     if (!isConfigured) return
-    const data = {
+    const data: any = {
       company: form.company, role: form.role,
       description: pack(form),
-      start_date: form.start_date, end_date: form.end_date,
+      start_date: toISODate(form.start_date), end_date: form.current ? null : toISODate(form.end_date),
       current: form.current,
-      order: creating ? items.length : undefined
+      order: creating ? items.length : 0
     }
-    if (creating) {
-      await supabase.from('experience').insert(data)
-    } else {
-      await supabase.from('experience').update(data).eq('id', editing)
-    }
+    if (!creating) data.id = editing
+    console.log('[experience save] payload:', JSON.stringify(data))
+    const query = creating ? supabase.from('experience').insert(data) : supabase.from('experience').update(data).eq('id', editing)
+    const { error } = await query
+    if (error) { alert('Erreur Supabase: ' + error.message + (error.details ? '\n' + error.details : '')); return }
     cancel(); await load()
   }
 

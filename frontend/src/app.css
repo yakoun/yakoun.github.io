@@ -6,20 +6,51 @@
   .animate-fade-in {
     animation: fadeInUp 0.5s ease-out both;
   }
+  .animate-scale-up {
+    animation: scaleUp 0.4s ease-out both;
+  }
+  .animate-slide-left {
+    animation: slideLeft 0.5s ease-out both;
+  }
+  .animate-slide-down {
+    animation: slideDown 0.3s ease-out both;
+  }
+  .animate-ping-slow {
+    animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
 }
 
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes slideLeft {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 antialiased transition-colors duration-300;
-    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
   }
   ::selection {
     @apply bg-primary-500/30 text-primary-900 dark:text-primary-100;
+  }
+  /* Focus visible ring for accessibility */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary-500;
   }
 }
 
