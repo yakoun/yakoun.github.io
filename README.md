@@ -14,43 +14,71 @@ Portfolio professionnel pour électrotechnicien & développeur — SvelteKit 4 +
 | Backend | Supabase (PostgreSQL, Auth, Storage, Realtime) |
 | Déploiement | Docker + Nginx (Oracle Cloud) |
 
+## Pages publiques
+
+| Page | Description |
+|------|-------------|
+| **Accueil** | Hero split (image outils électriques), services (image set électrique), bandeau expertise (pylône HT + stats), projets récents, CTA |
+| **CV / À propos** | Profil, compétences animées, timeline expériences/formations, certifications, langues, loisirs, logiciels. Export PDF et impression |
+| **Projets** | Grille responsive avec effet 3D tilt, filtres par catégorie (émojis), recherche, projets à la une en hero cards, animations d'entrée `fly` |
+| **Projet détail** | Carrousel d'images, infos, technologies, partage, projets similaires |
+| **Galerie** | Grille masonry, lightbox (clavier, swipe), filtres par catégorie |
+| **Contact** | Formulaire → Supabase messages + WhatsApp |
+| **404** | Page d'erreur personnalisée avec code status + boutons retour/accueil |
+
+## Admin dashboard
+
+| Fonctionnalité | Détail |
+|----------------|--------|
+| **Statistiques** | 12 cartes cliquables, graphiques Chart.js (radar, barres, timeline) |
+| **Temps réel** | Toast + badge compteur lors d'un nouveau message (subscribe Realtime) |
+| **CRUD complet** | Profil, expériences, formations, compétences, certifications, langues, loisirs, logiciels, projets, services, galerie, messages, paramètres |
+| **Auto-seeding** | Données de démonstration pré-remplies si tables vides |
+| **Import GitHub** | Sync des repos publics via API GitHub |
+| **Upload images** | Supabase Storage (bucket `folio`) |
+| **Certifications** | CRUD avec détection automatique table manquante + bouton création via `/api/setup` |
+| **Messages** | Marquage lu/non lu, badge compteur dans le header |
+| **Responsive** | Barre de navigation inférieure (mobile) avec 5 raccourcis + menu bottom sheet, sidebar desktop conservée |
+
 ## Structure
 
 ```
 portfolio/
-├── frontend/               # Application SvelteKit
+├── frontend/
 │   ├── src/
 │   │   ├── routes/
-│   │   │   ├── (app)/      # Pages publiques
-│   │   │   │   ├── +page.svelte       # Accueil
-│   │   │   │   ├── a-propos/          # CV complet
-│   │   │   │   ├── projets/           # Projets + détail
-│   │   │   │   └── contact/           # Formulaire
+│   │   │   ├── (app)/              # Pages publiques
+│   │   │   │   ├── +page.svelte                   # Accueil (3 images)
+│   │   │   │   ├── a-propos/+page.svelte          # CV complet
+│   │   │   │   ├── projets/+page.svelte           # Projets (godmod)
+│   │   │   │   ├── projets/[slug]/+page.svelte    # Détail projet
+│   │   │   │   ├── galerie/+page.svelte           # Galerie lightbox
+│   │   │   │   └── contact/+page.svelte           # Formulaire
 │   │   │   ├── (auth)/login/          # Connexion admin
 │   │   │   ├── admin/                 # Dashboard CRUD
+│   │   │   │   ├── +layout.svelte     # Layout responsive (mobile+desktop)
 │   │   │   │   ├── (dashboard)/       # Stats + graphiques + temps réel
-│   │   │   │   ├── profil/
-│   │   │   │   ├── experiences/
-│   │   │   │   ├── education/
-│   │   │   │   ├── skills/
-│   │   │   │   ├── certifications/
-│   │   │   │   ├── languages/
-│   │   │   │   ├── hobbies/
-│   │   │   │   ├── software/
-│   │   │   │   ├── projects/
-│   │   │   │   ├── services/
-│   │   │   │   ├── gallery/
-│   │   │   │   ├── messages/
-│   │   │   │   └── settings/
-│   │   │   └── api/                   # Endpoints serveur
+│   │   │   │   └── ...                # 14 sections CRUD
+│   │   │   ├── api/                   # Endpoints serveur
+│   │   │   │   ├── login/             # Auth Supabase
+│   │   │   │   ├── setup/             # Création auto des tables
+│   │   │   │   └── github-sync/       # Import GitHub
+│   │   │   ├── auth/callback/         # OAuth callback
+│   │   │   ├── sitemap.xml/           # Sitemap dynamique
+│   │   │   └── +error.svelte          # Page 404
 │   │   └── lib/
-│   │       ├── api/supabase.ts        # Client + fonctions
-│   │       ├── components/charts/     # RadarChart, BarChart, TimelineChart
+│   │       ├── api/
+│   │       │   ├── supabase.ts        # Client public + fonctions seedées
+│   │       │   └── supabase-admin.ts  # Client service_role (serveur)
+│   │       ├── components/
+│   │       │   ├── charts/            # RadarChart, BarChart, TimelineChart
+│   │       │   ├── ImageUpload.svelte
+│   │       │   ├── ThemeToggle.svelte
+│   │       │   └── Carousel.svelte
 │   │       ├── stores/theme.ts
 │   │       └── types/index.ts
-│   ├── supabase/
-│   │   ├── migrations/                # SQL schema
-│   │   └── functions/                 # Edge Functions
+│   ├── supabase/migrations/           # 00001_schema -> 00003_certifications
+│   ├── static/images/                 # hero.webp, electrical-set.jpg, pylon.jpg
 │   ├── Dockerfile
 │   └── package.json
 ├── scripts/                # setup-server, deploy, backup, update
@@ -72,7 +100,7 @@ portfolio/
 | `languages` | SELECT | OUI | NON |
 | `hobbies` | SELECT | OUI | NON |
 | `software_tools` | SELECT | OUI | NON |
-| `projects` | SELECT | OUI | NON |
+| `projects` | SELECT (featured) | OUI | NON |
 | `services` | SELECT | OUI | NON |
 | `gallery` | SELECT | OUI | NON |
 | `settings` | SELECT | OUI | NON |
@@ -97,6 +125,17 @@ portfolio/
 - Bucket `folio` pour les images de projets
 - URLs publiques via `getPublicUrl()`
 
+## Fonctionnalités récentes
+
+- **Page 404 personnalisée** : `+error.svelte` avec code status et navigation
+- **Galerie publique** : Lightbox avec navigation clavier, filtres catégorie
+- **Sitemap dynamique** : Généré automatiquement depuis les projets Supabase
+- **Messages lu/non lu** : Badge compteur + bascule dans le détail
+- **Admin responsive** : Bottom nav + bottom sheet sur mobile
+- **Seed data** : Toutes les fonctions API ont des données de démonstration en fallback
+- **Effet 3D tilt** : Cartes projets avec rotation perspective au survol
+- **Images homepage** : 3 images intégrées (héro, services, expertise)
+
 ## Installation locale
 
 ```bash
@@ -110,56 +149,28 @@ npm install
 # 3. Configurer Supabase
 # Copier .env et renseigner les clés Supabase :
 PUBLIC_SUPABASE_URL=votre_url
-PUBLIC_SUPABASE_PUBLISHABLE_KEY=votre_cle
+PUBLIC_SUPABASE_PUBLISHABLE_KEY=votre_cle_publique
+SUPABASE_SECRET_KEY=votre_cle_service_role
 PUBLIC_SITE_URL=http://localhost:5173
 
-# 4. Lancer en dev
+# 4. Créer les tables (SQL Editor Supabase Dashboard)
+# Exécuter dans l'ordre :
+#   supabase/migrations/00001_schema.sql
+#   supabase/migrations/00002_portfolio_cv.sql
+#   supabase/migrations/00003_certifications.sql
+# Optionnel : supabase/migrations/seed.sql
+
+# 5. Créer l'admin Supabase
+# Dans Authentication > Users > Add User
+# Email: admin@yakoun.tg, mot de passe au choix
+
+# 6. Lancer en dev
 npm run dev
 ```
 
-### Créer les tables Supabase
+### Création automatique des tables
 
-```sql
--- Exécuter dans le SQL Editor Supabase Dashboard
--- migrations/00001_schema.sql
--- migrations/00002_portfolio_cv.sql
--- Puis :
-CREATE TABLE certifications (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  title text NOT NULL,
-  organization text,
-  date text,
-  description text,
-  created_at timestamptz DEFAULT now()
-);
-ALTER TABLE certifications ENABLE ROW LEVEL SECURITY;
-```
-
-### Créer l'admin Supabase
-
-```bash
-# Dans Authentication > Users > Add User
-# Email: admin@yakoun.tg, mot de passe au choix
-```
-
-## Fonctionnalités
-
-### Site public
-
-- **Accueil** : Hero, services, projets récents, CTA
-- **CV / À propos** : Compétences animées, timeline expériences, formations, certifications, loisirs. Export PDF et impression.
-- **Projets** : Grille, filtres par catégorie, recherche, galerie d'images
-- **Contact** : Formulaire → Supabase messages + WhatsApp
-
-### Admin dashboard
-
-- **12 cartes stats** cliquables redirigeant vers chaque section
-- **Graphiques Chart.js** : Radar (compétences/catégorie), barres (top compétences, top logiciels), timeline (durée expériences)
-- **Temps réel** : Toast et badge lors d'un nouveau message
-- **CRUD complet** : Profil, expériences, formations, compétences, certifications, langues, loisirs, logiciels, projets, services, galerie, messages, paramètres
-- **Auto-seeding** : Données CV pré-remplies si tables vides
-- **Import GitHub** : Sync des repos publics
-- **Upload images** : Supabase Storage
+Dans l'admin → Certifications, un bouton **"Créer la table automatiquement"** tente de créer la table via l'API. Si l'API RPC n'est pas disponible, le SQL est affiché pour exécution manuelle dans le dashboard Supabase.
 
 ## Déploiement (Oracle Cloud)
 
@@ -184,18 +195,19 @@ bash scripts/deploy.sh production
 | `npm run dev` | Dev serveur (port 5173) |
 | `npm run build` | Build production |
 | `npm run preview` | Preview production |
-| `scripts/deploy.sh` | Déploiement complet |
+| `scripts/deploy.sh` | Déploiement complet Docker |
 | `scripts/backup.sh` | Sauvegarde BDD |
 | `scripts/update.sh` | Mise à jour système |
+| `scripts/setup-server.sh` | Bootstrap serveur Ubuntu |
 
 ## Services proposés
 
-- Installation électrique (NF C 15-100)
-- Installation parabole (mono/multi-satellite)
-- Zones WiFi mesh
-- Relais WiFi point-to-point (jusqu'à 10 km)
-- Réseaux RJ45, fibre, switch, VLAN
-- Développement web, mobile, prototypage
+- ⚡ Installation électrique (NF C 15-100)
+- 📡 Installation parabole (mono/multi-satellite)
+- 📶 Zones WiFi mesh
+- 📻 Relais WiFi point-to-point (jusqu'à 10 km)
+- 🔗 Réseaux RJ45, fibre, switch, VLAN
+- 💻 Développement web, mobile, prototypage
 
 ---
 
