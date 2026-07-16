@@ -19,7 +19,7 @@
 
 <svelte:window on:keydown={key} />
 
-<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions a11y-no-noninteractive-element-interactions -->
 <div
   role="dialog"
   aria-modal="true"
