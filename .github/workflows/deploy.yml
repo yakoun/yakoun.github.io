@@ -31,6 +31,11 @@ jobs:
       - run: npm run build
         env:
           ADAPTER: static
+          PUBLIC_SUPABASE_URL: ${{ secrets.PUBLIC_SUPABASE_URL }}
+          PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+          PUBLIC_CONTACT_EMAIL: ${{ secrets.PUBLIC_CONTACT_EMAIL || 'contact@electrodev.fr' }}
+          PUBLIC_WHATSAPP_NUMBER: ${{ secrets.PUBLIC_WHATSAPP_NUMBER || '33600000000' }}
+          PUBLIC_SITE_URL: https://yakoun.github.io
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
