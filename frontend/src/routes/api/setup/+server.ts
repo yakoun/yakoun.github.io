@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { createClient } from '@supabase/supabase-js'
-import { SUPABASE_SECRET_KEY } from '$env/static/private'
+import { env } from '$env/dynamic/private'
 import { PUBLIC_SUPABASE_URL } from '$env/static/public'
 
 const certificationsSQL = `CREATE TABLE IF NOT EXISTS certifications (
@@ -19,7 +19,7 @@ DROP POLICY IF EXISTS "Admin write certifications" ON certifications;
 CREATE POLICY "Admin write certifications" ON certifications FOR ALL USING (auth.role() = 'authenticated');`
 
 export async function POST() {
-  const supabaseAdmin = createClient(PUBLIC_SUPABASE_URL, SUPABASE_SECRET_KEY)
+  const supabaseAdmin = createClient(PUBLIC_SUPABASE_URL, env.SUPABASE_SECRET_KEY)
 
   // Try via RPC
   for (const rpcName of ['exec_sql', 'pg_query']) {
@@ -36,7 +36,7 @@ export async function POST() {
     const res = await fetch(`https://api.supabase.com/v1/projects/aqcpfjoeczyuxvqodlth/database/query`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${SUPABASE_SECRET_KEY}`,
+        'Authorization': `Bearer ${env.SUPABASE_SECRET_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ query: certificationsSQL }),
