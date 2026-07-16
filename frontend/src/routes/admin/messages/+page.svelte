@@ -57,7 +57,7 @@
     <p class="text-gray-500">Aucun message pour l'instant</p>
   </div>
 {:else}
-  <div class="grid lg:grid-cols-2 gap-6">
+    <div class="grid md:grid-cols-2 gap-6">
     <div class="space-y-3">
       {#each messages as msg}
         <button

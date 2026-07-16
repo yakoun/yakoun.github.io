@@ -111,7 +111,7 @@
 
   <!-- Filters Bar -->
   <div class="card p-3 flex flex-wrap items-center gap-3">
-    <div class="relative flex-1 min-w-[200px]">
+    <div class="relative flex-1 min-w-[140px]">
       <Search size={16} class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
       <input type="text" placeholder="Rechercher un projet..." bind:value={search} class="input pl-9 text-sm" />
       {#if search}

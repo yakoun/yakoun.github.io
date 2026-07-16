@@ -3,6 +3,8 @@
   import { getProfile, getServices, getProjects, isConfigured } from '$lib/api/supabase'
   import { ArrowRight, Mail, Phone, MapPin, Zap, Wifi, Code, Sparkles } from 'lucide-svelte'
 
+  const iconMap: Record<string, any> = { Zap, Wifi, Code, Sparkles, ArrowRight }
+
   let profile: any = null
   let projects: any[] = []
   let services: any[] = []
@@ -20,11 +22,11 @@
   })
 
   const defaultProfile = {
-    first_name: 'Thomas', last_name: 'Dubois',
+    first_name: 'Ouniboryabi', last_name: 'YAKOUN',
     title: 'Électrotechnicien & Développeur',
     summary: 'Expert en installation électrique, réseaux et développement web.',
-    phone: '+33 6 00 00 00 00', email: 'contact@electrodev.fr',
-    address: 'Région Parisienne',
+    phone: '+228 97 53 33 07', email: 'sylvanoyakoun@gmail.com',
+    address: 'Tsevie, Togo',
   }
 
   $: p = profile || defaultProfile
@@ -122,7 +124,7 @@
         {#each svc as s, i}
           <div class="card-hover text-center {i === 2 ? 'md:col-span-2 lg:col-span-1' : ''}" style="animation-delay: {i * 100}ms">
             <div class="w-12 h-12 mx-auto rounded-xl bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center text-primary-600 mb-4">
-              <svelte:component this={s.icon || Zap} size={24} />
+              <svelte:component this={iconMap[s.icon] || Zap} size={24} />
             </div>
             <h3 class="text-lg font-semibold mb-2">{s.title}</h3>
             <p class="text-sm text-gray-500 dark:text-gray-400">{s.description}</p>
@@ -156,7 +158,7 @@
             <p class="text-xs md:text-sm text-gray-400">Années d'expérience</p>
           </div>
           <div>
-            <p class="text-2xl md:text-3xl font-bold text-white">50+</p>
+            <p class="text-2xl md:text-3xl font-bold text-white">30+</p>
             <p class="text-xs md:text-sm text-gray-400">Projets réalisés</p>
           </div>
           <div>

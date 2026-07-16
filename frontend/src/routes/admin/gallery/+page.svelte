@@ -61,7 +61,7 @@
   </div>
 {/if}
 
-<div class="grid md:grid-cols-3 gap-4">
+    <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
   {#each items as item}
     <div class="card p-3">
       <img src={item.image_url} alt={item.title} class="w-full h-40 object-cover rounded-xl mb-3" loading="lazy" />

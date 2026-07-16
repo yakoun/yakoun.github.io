@@ -92,7 +92,7 @@
 
 <!-- Notification toast -->
 {#if notification}
-  <div class="fixed top-4 right-4 z-50 max-w-sm animate-slideDown" style="animation: slideDown 0.3s ease-out">
+  <div class="fixed top-4 inset-x-4 sm:inset-x-auto sm:right-4 z-50 max-w-sm animate-slide-down" style="animation: slideDown 0.3s ease-out">
     <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-primary-200 dark:border-primary-800 p-4 flex items-start gap-3">
       <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 shrink-0">
         <Bell size={16} />
@@ -126,7 +126,7 @@
       <div key={i} class="card p-4 animate-pulse h-20" />
     {/each}
   </div>
-  <div class="grid lg:grid-cols-2 gap-6">
+  <div class="grid md:grid-cols-2 gap-6">
     {#each [1,2,3] as i}
       <div key={i} class="card animate-pulse h-64" />
     {/each}
@@ -185,7 +185,7 @@
   </div>
 
   <!-- Charts row 1 -->
-  <div class="grid lg:grid-cols-2 gap-6 mb-6">
+  <div class="grid md:grid-cols-2 gap-6 mb-6">
     <div class="card p-5">
       <div class="flex items-center gap-2 mb-4">
         <div class="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600"><BarChart3 size={16} /></div>
@@ -214,7 +214,7 @@
   </div>
 
   <!-- Charts row 2 -->
-  <div class="grid lg:grid-cols-2 gap-6 mb-6">
+  <div class="grid md:grid-cols-2 gap-6 mb-6">
     <div class="card p-5">
       <div class="flex items-center gap-2 mb-4">
         <div class="w-8 h-8 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center text-cyan-600"><Cpu size={16} /></div>

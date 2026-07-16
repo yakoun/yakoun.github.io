@@ -2,7 +2,6 @@
   export let src: string
   export let alt = ''
   export let loading: 'lazy' | 'eager' = 'lazy'
-  export let priority = false
 
   let loaded = false
   let error = false

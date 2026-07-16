@@ -58,7 +58,7 @@
     </button>
   {/if}
 
-  <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions -->
+  <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-static-element-interactions a11y-no-noninteractive-element-interactions -->
   <div class="flex max-h-[88vh] max-w-5xl flex-col items-center" on:click|stopPropagation in:scale={{ duration: 350, start: 0.92, easing: backOut }}>
     {#if current}
       <img src={current.image_url} alt={current.title || 'Image'} class="max-h-[75vh] w-auto max-w-full rounded-2xl object-contain shadow-2xl" />
