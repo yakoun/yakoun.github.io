@@ -12,14 +12,8 @@
   async function handleSubmit() {
     loading = true; error = ''
     try {
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Erreur de connexion')
-      await supabase.auth.setSession(data.session)
+      const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password })
+      if (authError) throw new Error(authError.message)
       goto('/admin')
     } catch (err: any) {
       error = err?.message || 'Email ou mot de passe incorrect'
