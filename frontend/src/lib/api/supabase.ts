@@ -151,6 +151,10 @@ export async function sendMessage(name: string, email: string, message: string) 
 }
 
 export async function getGallery() {
-  const { data } = await supabase.from('gallery').select('*').order('order')
-  return data ?? []
+  try {
+    const { data } = await supabase.from('gallery').select('*').order('order')
+    return data ?? []
+  } catch {
+    return []
+  }
 }

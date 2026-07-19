@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { supabase } from '$lib/api/supabase'
+  import { getProjects } from '$lib/api/supabase'
   import { CATEGORIES, CATEGORY_LABELS } from '$lib/types'
   import { onMount } from 'svelte'
   import { fly, scale } from 'svelte/transition'
@@ -13,10 +13,7 @@
   let visible = new Set<number>()
 
   onMount(async () => {
-    try {
-      const { data } = await supabase.from('projects').select('*').order('date', { ascending: false })
-      projects = data || []
-    } catch (_) { /* offline */ }
+    projects = await getProjects()
     loading = false
   })
 

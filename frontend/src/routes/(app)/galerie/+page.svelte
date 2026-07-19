@@ -1,18 +1,13 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { supabase } from '$lib/api/supabase'
+  import { getGallery } from '$lib/api/supabase'
   import Gallery from '$lib/components/gallery/Gallery.svelte'
 
   let items: any[] = []
   let loading = true
 
   onMount(async () => {
-    try {
-      const { data } = await supabase.from('gallery').select('*').order('order')
-      items = data ?? []
-    } catch {
-      items = []
-    }
+    items = await getGallery()
     loading = false
   })
 </script>
