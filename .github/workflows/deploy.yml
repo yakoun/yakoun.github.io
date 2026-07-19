@@ -32,7 +32,7 @@ jobs:
         env:
           ADAPTER: static
           PUBLIC_SUPABASE_URL: https://aqcpfjoeczyuxvqodlth.supabase.co
-          PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_dy1sShCprQXPTwcSdrvaxg_PJhYqAXd
+          PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_51e4a5121a6cb3f3c49c4ae39d01e791
           PUBLIC_CONTACT_EMAIL: contact@electrodev.fr
           PUBLIC_WHATSAPP_NUMBER: '33600000000'
           PUBLIC_SITE_URL: https://yakoun.github.io
